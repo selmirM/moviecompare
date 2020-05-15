@@ -1,5 +1,5 @@
 const autoCompleteConfig = {
-    renderOption : (movie) => {
+    renderOption: (movie) => {
         const imgSrc = movie.Poster === 'N/A' ? '' : movie.Poster;
         return `
         <img src="${imgSrc}" />
@@ -20,7 +20,7 @@ const autoCompleteConfig = {
         if (response.data.Error) {
             return [];
         }
-    
+
         return response.data.Search;
     },
     searchTitle: 'Search For a Movie'
@@ -28,18 +28,18 @@ const autoCompleteConfig = {
 
 createAutoComplete({
     ...autoCompleteConfig,
-    root : document.querySelector('#left-autocomplete'),
-    onOptionSelect : (movie, summaryElement) => {
+    root: document.querySelector('#left-autocomplete'),
+    onOptionSelect: (movie, summaryElement) => {
         document.querySelector('.tutorial').classList.add('is-hidden');
         onMovieSelect(movie, document.querySelector('#left-summary'), 'left');
     }
-    }
+}
 );
 
 createAutoComplete({
     ...autoCompleteConfig,
-    root : document.querySelector('#right-autocomplete'),
-    onOptionSelect : (movie, summaryElement) => {
+    root: document.querySelector('#right-autocomplete'),
+    onOptionSelect: (movie, summaryElement) => {
         document.querySelector('.tutorial').classList.add('is-hidden');
         onMovieSelect(movie, document.querySelector('#right-summary'), 'right');
     }
@@ -57,7 +57,7 @@ const onMovieSelect = async (movie, summaryElement, side) => {
 
     summaryElement.innerHTML = movieTemplate(response.data);
 
-    if(side === 'left') {
+    if (side === 'left') {
         leftMovie = response.data;
     } else {
         rightMovie = response.data;
@@ -69,13 +69,31 @@ const onMovieSelect = async (movie, summaryElement, side) => {
 };
 
 const runComparison = () => {
-    const leftSideStats = document.querySelectorAll('#left-summary .notification');
-    const rightSideStats = document.querySelectorAll('#right-summary .notification');
+    const leftSideStats = document.querySelectorAll(
+        '#left-summary .notification'
+    );
+    const rightSideStats = document.querySelectorAll(
+        '#right-summary .notification'
+    );
 
-}
+    leftSideStats.forEach((leftStat, index) => {
+        const rightStat = rightSideStats[index];
+
+        const leftSideValue = leftStat.dataset.value; // <------ BAD
+        const rightSideValue = rightStat.dataset.value; // <------ BAD
+
+        if (rightSideValue > leftSideValue) {
+            leftStat.classList.remove('is-primary');
+            leftStat.classList.add('is-warning');
+        } else {
+            rightStat.classList.remove('is-primary');
+            rightStat.classList.add('is-warning');
+        }
+    });
+};
 
 const movieTemplate = (movieDetail) => {
-    const dollars = parseInt(movieDetail.BoxOffice.replace(/\$/g,'').replace(/,/g, ''));
+    const dollars = parseInt(movieDetail.BoxOffice.replace(/\$/g, '').replace(/,/g, ''));
     const metascore = parseInt(movieDetail.Metascore);
     const imdbRating = parseFloat(movieDetail.imdbRating);
     const imdbVotes = parseInt(movieDetail.imdbVotes.replace(/,/g, ''));
